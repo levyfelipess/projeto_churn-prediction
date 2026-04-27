@@ -30,7 +30,8 @@ def random_search_with_kfoldcv(model,
         pd.DataFrame: Tabela com as combinações testadas juntamente com suas métricas médias nos conjuntos de validação.
 
     Notes:
-        Em "hyperparam_distributions", é possível passar uma lista com os elementos a serem escolhidos aleatoriamente. A escolha será de modo uniforme.
+        Em "hyperparam_distributions", é possível passar uma lista com os elementos a serem escolhidos aleatoriamente.
+        A escolha será de modo uniforme.
     """
     masks = list(StratifiedKFold(n_splits=k, shuffle=True, random_state=global_seed).split(df_X_train, df_y_train))
     hyperparam_combinations = {}
@@ -79,7 +80,8 @@ def parallelized_random_search_with_kfoldcv(model,
                                             transformer_X, transformer_y,
                                             n_jobs, global_seed=7):
     """
-    Performa otimização de hiperparâmetros por maximização da AUROC utilizando busca aleatória com validação cruzada k-fold estratificada com a possibilidade de paralelização nos folds.
+    Performa otimização de hiperparâmetros por maximização da AUROC utilizando busca aleatória com validação cruzada k-fold estratificada
+    com a possibilidade de paralelização nos folds.
 
     Args:
         model: Modelo;
@@ -97,7 +99,8 @@ def parallelized_random_search_with_kfoldcv(model,
         pd.DataFrame: Tabela com as combinações testadas juntamente com suas métricas médias nos conjuntos de validação.
 
     Notes:
-        Em "hyperparam_distributions", é possível passar uma lista com os elementos a serem escolhidos aleatoriamente. A escolha será de modo uniforme.
+        Em "hyperparam_distributions", é possível passar uma lista com os elementos a serem escolhidos aleatoriamente.
+        A escolha será de modo uniforme.
     """
     masks = list(StratifiedKFold(n_splits=k, shuffle=True, random_state=global_seed).split(df_X_train, df_y_train))
     hyperparam_combinations = {}
