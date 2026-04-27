@@ -13,8 +13,7 @@ def highlight_nthmax(nth_max=1):
         function: Função que aplicará o realce.
 
     Note:
-        A função de saída deve ser utilizada nos objetos Styler do pandas,
-        como argumento do método ".apply".
+        A função de saída deve ser utilizada nos objetos Styler do pandas, como argumento do método ".apply".
     """
     def highlight_max(s, props=""):
         a = np.array([''] * np.size(s), dtype='object')
