@@ -14,11 +14,42 @@ sns.set_theme(context='notebook', style='ticks')
 plt.rcParams['font.family'] = 'Times New Roman'
 plt.rcParams['mathtext.fontset'] = 'cm'
 
-def evaluate(model, X_train, X_test, y_train, y_test,
+def evaluate(model,
+             X_train, X_test, y_train, y_test,
              threshold=0.5, beta_fscore=1, dig=3, model_title='', threshold_step=0.01,
-             display_metrics_table=True, plot_confusion_matrix=True, plot_roc_prc=True,
-             save_metrics_table=False, save_confusion_matrix=False, save_roc_prc=False,
-             path_metrics_table='metrics_table.csv', path_confusion_matrix='confusion_matrix.png', path_roc_prc='roc_pr_curves.png'):
+             display_metrics_table=True, plot_confusion_matrix=True, plot_roc_pr_curve=True,
+             save_metrics_table=False, save_confusion_matrix=False, save_roc_pr_curve=False,
+             path_metrics_table='metrics_table.csv', path_confusion_matrix='confusion_matrix.png', path_roc_pr_curve='roc_pr_curves.png'):
+    """
+    Avalia um modelo individualmente com muitas métricas, nos conjuntos de treinamento e teste.
+
+    Args:
+        model: Modelo;
+        X_train (np.array or pd.DataFrame): Matriz de treinamento dos atributos de entrada;
+        X_test (np.array or pd.DataFrame): Matriz de teste dos atributos de entrada;
+        y_train (np.array or pd.DataFrame): Vetor de treinamento do atributo de saída;
+        y_test(np.array or pd.DataFrame): Vetor de teste do atributo de saída;
+        threshold (float, optional): Limiar de decisão para classe positiva;
+        beta_fscore (float, optional): Ponderação do Recall na métrica F-beta Score;
+        dig (int, optional): Número de dígitos a serem exibidos nas tabelas e matriz de confusão;
+        model_title (str, optional): Título que será exibido nas tabelas e gráficos das métricas;
+        threshold_step (float, optional): Passo de limiar para plotagem das curvas ROC e PR;
+        display_metrics_table (bool, optional): Indica se a tabela com métricas deve ser exibida;
+        plot_confusion_matrix (bool, optional): Indica se as matrizes de confusão devem ser plotadas;
+        plot_roc_pr_curve (bool, optional): Indica se as curvas roc e pr devem ser plotadas;
+        save_metrics_table (bool, optional): Indica se a tabela com métricas deve ser salva;
+        save_confusion_matrix (bool, optional): Indica se as matrizes de confusão devem ser salvas;
+        save_roc_pr_curve (bool, optional): Indica se as curvas roc e pr devem ser salvas;
+        path_metrics_table (str, optional): Caminho completo para armazenamento da tabela de métricas;
+        path_confusion_matrix (str, optional): Caminho completo para armazenamento das matrizes de confusão;
+        path_roc_pr_curve (str, optional): Caminho completo para armazenamento das curvas roc e pr.
+
+    Returns:
+        dict[str, str]: Coleção das métricas nos conjuntos de treinamento e teste.
+
+    Notes:
+        As matrizes de dados já devem estar normalizadas.
+    """
     y_train_prob_pred = model.predict_proba(X=X_train)[:, 1]
     y_test_prob_pred = model.predict_proba(X=X_test)[:, 1]
     y_train_pred = np.int32(y_train_prob_pred >= threshold)
@@ -77,10 +108,17 @@ def evaluate(model, X_train, X_test, y_train, y_test,
         conf_matrix_normalized = conf_matrix / conf_matrix.sum()
         
         fig, ax = plt.subplots(1, 4, figsize=(2.5 * 4, 2.5), layout='constrained')
-        sns.heatmap(conf_matrix, ax=ax[0], annot=True, annot_kws={'size':15}, fmt='.0f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01)
-        sns.heatmap(conf_matrix_normalized_prow, ax=ax[1], annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01, vmin=0., vmax=1.)
-        sns.heatmap(conf_matrix_normalized_pcol, ax=ax[2], annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01, vmin=0., vmax=1.)
-        sns.heatmap(conf_matrix_normalized, ax=ax[3], annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01, vmin=0., vmax=1.)
+        sns.heatmap(conf_matrix, ax=ax[0],
+                    annot=True, annot_kws={'size':15}, fmt='.0f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01)
+        sns.heatmap(conf_matrix_normalized_prow, ax=ax[1],
+                    annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01,
+                    vmin=0., vmax=1.)
+        sns.heatmap(conf_matrix_normalized_pcol, ax=ax[2],
+                    annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01,
+                    vmin=0., vmax=1.)
+        sns.heatmap(conf_matrix_normalized, ax=ax[3],
+                    annot=True, annot_kws={'size':15}, fmt='.3f', cmap='Blues', cbar=False, linecolor='black', linewidths=.01,
+                    vmin=0., vmax=1.)
         for i in range(4):
             ax[i].set_xticklabels(['No', 'Yes'])
             ax[i].set_yticklabels(['No', 'Yes'], rotation=0)
@@ -95,7 +133,7 @@ def evaluate(model, X_train, X_test, y_train, y_test,
             fig.savefig(path_confusion_matrix, dpi=300)
         plt.show()
 
-    if plot_roc_prc:
+    if plot_roc_pr_curve:
         threshold_vec = np.arange(0., 1. + threshold_step, threshold_step)[::-1]
         fpr_vec = np.empty_like(threshold_vec)
         tpr_vec = np.empty_like(threshold_vec)
@@ -141,16 +179,33 @@ def evaluate(model, X_train, X_test, y_train, y_test,
         ax[1].grid(lw=.5)
         ax[0].legend(loc='best')
         ax[1].legend(loc='best')
-        if save_roc_prc:
-            fig.savefig(path_roc_prc, dpi=300)
+        if save_roc_pr_curve:
+            fig.savefig(path_roc_pr_curve, dpi=300)
         plt.show()
 
     return metrics_dict
 
-def evaluate_all_models_and_get_final_comparison_dict(models,
-                                                      transformers_X, transformer_y,
-                                                      df_X_train, df_X_test, df_y_train, df_y_test,
-                                                      threshold=0.5, beta_fscore=2.):
+def evaluate_several_models(models,
+                            transformers_X, transformer_y,
+                            df_X_train, df_X_test, df_y_train, df_y_test,
+                            threshold=0.5, beta_fscore=2.):
+    """
+    Avalia diversos modelos.
+
+    Args:
+        models (dict[str, model]): Modelos a serem avaliados;
+        transformers_X (dict[str, transformer]): Normalizações dos atributos de entrada, específicas para cada modelo;
+        transformer_y: Normalização do atributo de saída;
+        df_X_train (pd.DataFrame): Matriz de treinamento dos atributos de entrada sem normalização;
+        df_X_test (pd.DataFrame): Matriz de teste dos atributos de entrada sem normalização;
+        df_y_train (pd.DataFrame or pd.Series): Vetor de treinamento do atributo de saída sem normalização;
+        df_y_test (pd.DataFrame or pd.Series): Vetor de teste do atributo de saída sem normalização;
+        threshold (float, optional): Limiar de decisão para classe positiva;
+        beta_fscore (float, optional): Ponderação do Recall na métrica F-beta Score;
+
+    Returns:
+        dict[str, str]: Coleção de métricas no conjunto de testes para cada modelo.
+    """
     metrics_final_comparison = {}
     y_train = transformer_y.fit_transform(df_y_train)
     y_test = transformer_y.transform(df_y_test)
@@ -165,8 +220,8 @@ def evaluate_all_models_and_get_final_comparison_dict(models,
         metrics_final_comparison[key] = evaluate(model=models[key],
                                                  X_train=X_train_transformed, X_test=X_test_transformed, y_train=y_train, y_test=y_test,
                                                  beta_fscore=beta_fscore, threshold=threshold,
-                                                 display_metrics_table=False, plot_confusion_matrix=False, plot_roc_prc=False,
-                                                 save_metrics_table=False, save_confusion_matrix=False, save_roc_prc=False)['Teste']
+                                                 display_metrics_table=False, plot_confusion_matrix=False, plot_roc_pr_curve=False,
+                                                 save_metrics_table=False, save_confusion_matrix=False, save_roc_pr_curve=False)['Teste']
     return metrics_final_comparison
 
 def display_best_hyperparam_combinations(df,
@@ -174,19 +229,56 @@ def display_best_hyperparam_combinations(df,
                                          with_one_standard_error_rule=True,
                                          metric_mean_column='auc (mean)',
                                          metric_se_column='auc (se)',
+                                         sort_by=None, ascending=False,
                                          style_format={}):
+    """
+    Exibe uma tabela com as configurações campeãs de hiperparâmetros.
+
+    Args:
+        df (pd.DataFrame): Combinações de hiperparâmetros com a métrica de decisão;
+        n_best (int or None, optional): Número de combinações a serem exibidas. Se n_best=None, exibe todas as combinações;
+        with_one_standard_error_rule (bool, optional): Indica se a regra do "1 erro padrão" deve ser aplicada;
+        metric_mean_column (str, optional): Nome da coluna de métrica média no dataframe;
+        metric_se_column (str, optional): Nome da coluna de erro padrão da métrica média no dataframe;
+        sort_by (str or None, optional): Nome da coluna que será utilizada para ordenação.
+                                         Se sort_by=None, a ordenação será por metric_mean_column;
+        ascending (bool, optional): Indica se a ordenação deve ser feita de modo crescente (True) ou decrescente (False);
+        style_format (dict[str, str or function], optional): Estilo de formatação para quaisquer hiperparâmetros que se queira.
+    """
+    if sort_by == None:
+        sort_by = metric_mean_column
+        
     if with_one_standard_error_rule:
         best_hyperparam_id = np.argmax(df.loc[:, metric_mean_column])
-        id_bests = np.where(df.loc[:, metric_mean_column] >= df.loc[best_hyperparam_id, metric_mean_column] - df.loc[best_hyperparam_id, metric_se_column])[0]
-        display(df.loc[id_bests].sort_values(by=metric_mean_column, ascending=False).style.format(style_format))
+        one_standard_error_range = df.loc[best_hyperparam_id, metric_mean_column] - df.loc[best_hyperparam_id, metric_se_column]
+        id_bests = np.where(df.loc[:, metric_mean_column] >= one_standard_error_range)[0]
+        if n_best == None:
+            display(df.loc[id_bests].sort_values(by=sort_by, ascending=ascending).style.format(style_format))
+        else:
+            display(df.loc[id_bests].sort_values(by=sort_by, ascending=ascending).head(n_best).style.format(style_format))
         
     else:
-        display(df.sort_values(by=metric_mean_column, ascending=False).head(n_best).style.format(style_format))
+        if n_best == None:
+            display(df.sort_values(by=sort_by, ascending=ascending).style.format(style_format))
+        else:
+            display(df.sort_values(by=sort_by, ascending=ascending).head(n_best).style.format(style_format))
 
 def display_final_comparison_with_highlight(metrics_final_comparison_dict,
                                             table_title,
                                             save_table=False,
                                             path_table='final-comparison.csv'):
+    """
+    Exibe uma tabela as métricas de diversos modelos para comparação final, com realce para os:
+    - 1º melhores;
+    - 2º melhores;
+    - piores.
+
+    Args:
+        metrics_final_comparison_dict (dict[str, str or float]): Coleção das métricas para cada modelo;
+        table_title (str): Título da tabela;
+        save_table (bool, optional): Indica se a tabela deve ser salva;
+        path_table (str, optional): Caminho completo de armazenamento, caso a tabela seja salva
+    """
     metrics_final_comparison_df = pd.DataFrame(metrics_final_comparison_dict,
                                                index=['Acurácia','Precisão','Recall','F1-Score','F$_{\\beta}$-Score','AUROC','AUPRC'])
     if save_table:
