@@ -93,12 +93,13 @@ def evaluate(model,
     if display_metrics_table:
         display(
             pd.DataFrame(metrics_dict,
-                index=['Acurácia','Precisão','Recall','F1-Score','F$_{\\beta}$-Score','AUROC', 'AUPRC']
+                index=['Acurácia','Precisão','Recall','F1-Score','F'+ffp(beta_fscore, 2)+'-Score','AUROC', 'AUPR']
                         ).style.set_caption('Métricas de Avaliação'+model_title)
                 )
 
     if save_metrics_table:
-        df_metrics = pd.DataFrame(metrics_dict, index=['Acurácia','Precisão','Recall','F1-Score','Fbeta-Score','AUROC', 'AUPRC'])
+        df_metrics = pd.DataFrame(metrics_dict,
+                                  index=['Acurácia','Precisão','Recall','F1-Score','F'+ffp(beta_fscore, 2)+'-Score','AUROC', 'AUPR'])
         df_metrics.to_csv(path_metrics_table)
 
     if plot_confusion_matrix:
@@ -146,19 +147,19 @@ def evaluate(model,
             tpr_vec[i] = tpr
             pre_vec[i] = precision_score(y_pred=y_pred, y_true=y_test, zero_division=1.)
             
-        actual_threshold_id = np.argmin(np.abs(tpr_vec - rec_test))
+        current_threshold_id = np.argmin(np.abs(threshold_vec - threshold))
 
         fig, ax = plt.subplots(1, 2, figsize=(5 * 2, 5), layout='constrained')        
         sns.lineplot(ax=ax[0], x=fpr_vec, y=tpr_vec, lw=1.5, color='black')
         sns.lineplot(ax=ax[0], x=[0., 1.], y=[0., 1.], lw=.7, ls='--', color='black')
         sns.lineplot(ax=ax[1], x=tpr_vec, y=pre_vec, lw=1.5, color='black')
         sns.lineplot(ax=ax[1], x=[0., 1.], y=[y_test.mean()] * 2, lw=.7, ls='--', color='black')
-        sns.scatterplot(ax=ax[0], x=[fpr_vec[actual_threshold_id]], y=[tpr_vec[actual_threshold_id]],
+        sns.scatterplot(ax=ax[0], x=[fpr_vec[current_threshold_id]], y=[tpr_vec[current_threshold_id]],
                         marker='o', color='white', edgecolor='black', lw=1.,
-                        label=f'Actual ({threshold_vec[actual_threshold_id]:.2f})', zorder=3)
-        sns.scatterplot(ax=ax[1], x=[tpr_vec[actual_threshold_id]], y=[pre_vec[actual_threshold_id]],
+                        label=f'Atual ({threshold_vec[current_threshold_id]:.2f})', zorder=3)
+        sns.scatterplot(ax=ax[1], x=[tpr_vec[current_threshold_id]], y=[pre_vec[current_threshold_id]],
                         marker='o', color='white', edgecolor='black', lw=1.,
-                        label=f'Actual ({threshold_vec[actual_threshold_id]:.2f})', zorder=3)
+                        label=f'Atual ({threshold_vec[current_threshold_id]:.2f})', zorder=3)
         ax[0].fill_between(x=fpr_vec, y1=np.zeros_like(tpr_vec), y2=tpr_vec, color='black', alpha=.05)
         ax[1].fill_between(x=tpr_vec, y1=np.zeros_like(tpr_vec), y2=pre_vec, color='black', alpha=.05)
         ax[0].set_xticks(np.arange(0, 1.01, .1))
@@ -173,8 +174,8 @@ def evaluate(model,
         ax[0].set_ylabel('TPR')
         ax[1].set_xlabel('Recall')
         ax[1].set_ylabel('Precisão')
-        ax[0].set_title('ROC'+model_title+'\n$(\\text{AUROC}='+ffp(auroc_test, dig, min_digits=dig)+')$')
-        ax[1].set_title('PRC'+model_title+'\n$(\\text{AUPRC}='+ffp(auprc_test, dig, min_digits=dig)+')$')
+        ax[0].set_title('Curva ROC'+model_title+'\n$(\\text{AUROC}='+ffp(auroc_test, dig, min_digits=dig)+')$')
+        ax[1].set_title('Curva PR'+model_title+'\n$(\\text{AUPR}='+ffp(auprc_test, dig, min_digits=dig)+')$')
         ax[0].grid(lw=.5)
         ax[1].grid(lw=.5)
         ax[0].legend(loc='best')
