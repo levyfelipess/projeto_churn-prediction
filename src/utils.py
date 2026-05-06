@@ -1,6 +1,8 @@
 import numpy as np
+from numpy import format_float_positional as ffp
 import pandas as pd
 import joblib
+from datetime import timedelta
 
 def highlight_nthmax(nth_max=1):
     """
@@ -52,3 +54,26 @@ def load_models(models_names, path='../models/', format='.pkl'):
     for name in models_names:
         models[name] = joblib.load(path + name + format)
     return models
+
+def display_elapsed_time(final_time, initial_time, elapsed_time=None):
+    """
+    Exibe o tempo decorrido durante um processo.
+
+    Args:
+        final_time (float): Marcação de tempo ao final do processo, em segundos;
+        initial_time (float): Marcação de tempo ao início do processo, em segundos;
+        elapsed_time (float or None, optional): Tempo total transcorrido, em segundos.
+
+    Notes:
+        Apenas um, entre 'elapsed_time' e '(final_time, initial_time)' necessita ser passado;
+        Sendo ambos fornecidos, a preferência será para 'elapsed_time'.
+    """
+    if elapsed_time != None:
+        dt_s = elapsed_time
+    else:
+        dt_s = final_time - initial_time
+    h, m, s = str(timedelta(seconds=dt_s)).split(':')
+    dt_min = dt_s / 60
+    dt_h = dt_min / 60
+    print(f"Tempo Total: {dt_s:.0f} s | {dt_min:.1f} min | {dt_h:.1f} h")
+    print(f"             "+h+"h "+m+"min "+s[:2]+"s")

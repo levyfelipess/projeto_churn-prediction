@@ -64,9 +64,9 @@ class ZScoreNormalizer(BaseEstimator, TransformerMixin):
         """
         return (X * self.std_vec) + self.mean_vec
 
-def clean_data(df):
+def clean_data_eda(df):
     """
-    Aplica todas as transformações necessárias ao dataset original para torná-lo pronto para modelagem.
+    Aplica todas as transformações necessárias ao dataset original para torná-lo pronto para eda.
 
     Args:
         df (pd.DataFrame): Dataset original (raw).
@@ -87,6 +87,35 @@ def clean_data(df):
 
     df = df.astype({'SeniorCitizen':'object', 'tenure':'float64', 'TotalCharges':'float64'})
     return df
+
+def clean_data_modeling(df):
+    """
+    Aplica todas as transformações necessárias ao dataset original para torná-lo pronto para modelagem.
+
+    Args:
+        df (pd.DataFrame): Dataset original (raw).
+
+    Returns:
+        pd.DataFrame: Dataset tratado (processed) com variáveis de entrada;
+        pd.DataFrame: Dataset tratado (processed) com variável de saída.
+
+    Notes:
+        As transformações para o dataset deste problema incluem:
+            1. Retirada da coluna de ID "customerID";
+            2. Retirada das variáveis "gender" e "PhoneService";
+            2. Preenchimento de valores faltantes em "TotalCharges";
+            3. Conversão do tipo de "SeniorCitizen", "tenure" e "TotalCharges".
+    """
+    df = df.drop(columns=['customerID', 'gender', 'PhoneService'])
+
+    col_missing_values = np.where(df['TotalCharges'] == ' ')[0]
+    df.loc[col_missing_values, 'TotalCharges'] = df.loc[col_missing_values, 'MonthlyCharges']
+
+    df = df.astype({'SeniorCitizen':'object', 'tenure':'float64', 'TotalCharges':'float64'})
+    df_X = df.drop(columns='Churn')
+    df_y = df.loc[:, ['Churn']].copy()
+    
+    return df_X, df_y
 
 def get_transformers(df_X, df_y):
     """

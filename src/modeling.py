@@ -5,6 +5,23 @@ from tqdm import tqdm
 from sklearn.model_selection import StratifiedKFold
 from sklearn.metrics import roc_auc_score
 from joblib import Parallel, delayed
+from time import perf_counter
+from src.utils import display_elapsed_time
+
+def train_model(model, X, y):
+    """
+    Treina um modelo com '.fit()' e exibe o tempo decorrido durante um processo.
+
+    Args:
+        model: Modelo com método '.fit()' para treino;
+        X (np.array): Matriz de padrões de entrada de treino;
+        y (np.array): Vetor de padrões de saída de treino.
+    """
+    time0 = perf_counter()
+    model.fit(X=X, y=y)
+    timef = perf_counter()
+    
+    display_elapsed_time(final_time=timef, initial_time=time0)
 
 def random_search_with_kfoldcv(model,
                                df_X_train, df_y_train,
@@ -134,7 +151,10 @@ def parallelized_random_search_with_kfoldcv(model,
             metrics_hyperparams[comb] = roc_auc_score(y_score=y_val_prob_pred, y_true=y_val)
             
         return metrics_hyperparams
+    time0 = perf_counter()
     metrics_hyperparams = np.array( Parallel(n_jobs=n_jobs)(delayed(parallel_kfoldcv_fn)(i) for i in range(k)) )
+    timef = perf_counter()
+    display_elapsed_time(final_time=timef, initial_time=time0)
             
     hyperparam_combinations['auc (mean)'] = np.mean(metrics_hyperparams, axis=0)
     hyperparam_combinations['auc (std)'] = np.std(metrics_hyperparams, axis=0, ddof=1)
