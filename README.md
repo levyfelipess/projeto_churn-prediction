@@ -8,40 +8,22 @@ A evasão de clientes (_churn_) impacta diretamente a receita recorrente de empr
 
 Este projeto tem como objetivo prever o _churn_ e apoiar decisões de retenção baseadas em custo-benefício.
 
-## Estrutura do Projeto
-```
-├── data/
-│   ├── raw/
-│   └── processed/
-├── models/
-├── notebooks/
-│   ├── 01_eda.ipynb
-│   ├── 02_modeling_evaluation.ipynb
-│   └── 03_model-comparison_threshold-tuning.ipynb
-├── reports/
-│   ├── figures/
-│   └── tables/
-├── src/
-│   ├── eda.py
-│   ├── evaluation.py
-│   ├── modeling.py
-│   ├── models.py
-│   ├── preprocessing.py
-│   └── utils.py
-├── .gitignore
-├── README.md
-└── requirements.txt.py
-```
-
-## Visualização dos Notebooks
-Para uma experiência de visualização completa, se possível, acessar pelo NBViewer (principalmente o Notebook 3):
-
-> [Notebook 1: EDA](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/01_eda.ipynb) \
-> [Notebook 2: Modelagem e Avaliação](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/02_modeling_evaluation.ipynb) \
-> [Notebook 3: Comparação entre modelos e Análise de *Threshold*](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/03_model-comparison_threshold-tuning.ipynb)
-
 ## Metodologia
 
+### _Dataset_
+#### Links de acesso
+- [Link 1: Kaggle](https://www.kaggle.com/datasets/blastchar/telco-customer-churn);
+- [Link 2: IBM](https://community.ibm.com/community/user/blogs/steven-macko/2019/07/11/telco-customer-churn-1113).
+
+#### Sobre o _dataset_
+- Os dados contêm informações sobre uma empresa fictícia que forneceu serviços de telefonia fixa e internet para 7043 clientes na Califórnia (fonte: [Link 2](https://community.ibm.com/community/user/blogs/steven-macko/2019/07/11/telco-customer-churn-1113));
+- Cada linha representa um cliente, e cada coluna contém os atributos deste (fonte: [Link 1](https://www.kaggle.com/datasets/blastchar/telco-customer-churn)):
+  - Clientes que cancelaram o serviço no último mês: coluna `Churn`;
+  - Serviços contratados por cada cliente: telefone (coluna `PhoneService`), múltiplas linhas (coluna `MultipleLines`), internet (coluna `InternetService`), segurança online (coluna `OnlineSecurity`), backup online (coluna `OnlineBackup`), proteção de dispositivos (coluna `DeviceProtection`), suporte técnico (coluna `TechSupport`), streaming de TV (coluna `StreamingTV`) e de filmes (coluna `StreamingMovies`);
+  - Informações da conta do cliente: tempo de relacionamento (coluna `tenure`), tipo de contrato (coluna `Contract`), forma de pagamento (coluna `PaymentMethod`), faturamento eletrônico (coluna `PaperlessBilling`), valores mensais (coluna `MonthlyCharges`) e valor total a pagar (coluna `TotalCharges`);
+  - Informações demográficas sobre os clientes: sexo (coluna `gender`), faixa etária (coluna `SeniorCitizen`) e se possuem cônjuge (coluna `Partner`) ou dependentes (coluna `Dependents`).
+
+### Abordagem
 - Análise exploratória de dados (EDA);
 - Pré-processamento de dados (tratamento, normalização e codificação);
 - Comparação entre múltiplas abordagens:
@@ -79,11 +61,43 @@ Para uma experiência de visualização completa, se possível, acessar pelo NBV
 - Ajuste de _threshold_ baseado na consideração de custos desiguais de negócio (não apenas métricas padrão);
 - Comparação entre múltiplos cenários de custo (R = 2, 5, 10);
 
+## Estrutura do Projeto
+```
+├── data/
+│   ├── raw/
+│   └── processed/
+├── models/
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_modeling_evaluation.ipynb
+│   └── 03_model-comparison_threshold-tuning.ipynb
+├── reports/
+│   ├── figures/
+│   └── tables/
+├── src/
+│   ├── eda.py
+│   ├── evaluation.py
+│   ├── modeling.py
+│   ├── models.py
+│   ├── preprocessing.py
+│   └── utils.py
+├── .gitignore
+├── README.md
+└── requirements.txt.py
+```
+
 ## Como Executar o Projeto
 ```
 pip install -r requirements.txt
 ```
 e então rodar os notebooks.
+
+## Visualização dos Notebooks
+Para uma experiência de visualização completa, se possível, acessar pelo NBViewer (principalmente o Notebook 3):
+
+> [Notebook 1: EDA](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/01_eda.ipynb) \
+> [Notebook 2: Modelagem e Avaliação](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/02_modeling_evaluation.ipynb) \
+> [Notebook 3: Comparação entre modelos e Análise de *Threshold*](https://nbviewer.org/github/levyfelipess/projeto_churn-prediction/blob/main/notebooks/03_model-comparison_threshold-tuning.ipynb)
 
 ## Resultados
 
