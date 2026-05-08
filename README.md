@@ -63,6 +63,7 @@ Este projeto tem como objetivo prever o _churn_ e apoiar decisões de retenção
 
 ## Estrutura do Projeto
 ```
+projeto_churn-prediction/
 ├── data/
 │   ├── raw/
 │   └── processed/
@@ -83,14 +84,36 @@ Este projeto tem como objetivo prever o _churn_ e apoiar decisões de retenção
 │   └── utils.py
 ├── .gitignore
 ├── README.md
-└── requirements.txt.py
+└── requirements.txt
 ```
 
 ## Como Executar o Projeto
+#### 1. Clonar o repositório
+```
+git clone https://github.com/levyfelipess/projeto_churn-prediction
+```
+
+#### 2. Instalar dependências
+Dentro da pasta principal do repositório, `projeto_churn-prediction`
 ```
 pip install -r requirements.txt
 ```
 e então rodar os notebooks.
+
+#### (OPCIONAL, mas recomendado) Criar ambiente virtual
+Antes da etapa 2, dentro da pasta principal do repositório, `projeto_churn-prediction`
+```
+python -m venv .venv
+```
+e ative o ambiente (Windows):
+```
+.venv\Scripts\activate
+```
+ou (Linux / MacOS):
+```
+source .venv/bin/activate
+```
+e então, voltar à etapa 2.
 
 ## Visualização dos Notebooks
 Para uma experiência de visualização completa, se possível, acessar pelo NBViewer (principalmente o Notebook 3):
